@@ -3,13 +3,13 @@
 # from logbook.logbook import app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, Tag, Log
+from models import Base, Tag, Log, User
 import datetime
+# from logbook import app
+from config.development import DB_URI
 
-app.config['DB_URI'] = 'sqlite:////vagrant/logbook/db/logbook.db'
-
-engine = create_engine(app.config['DB_URI'])
-Base.metadata.create_engine(engine)
+engine = create_engine(DB_URI)
+Base.metadata.create_all(engine)
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
@@ -24,7 +24,7 @@ for u in users:
     session.add(user)
     session.commit()
 
-log = [
+logs = [
     ["sqlalchemy ORM tutorial", 
     "http://docs.sqlalchemy.org/en/rel_1_0/orm/tutorial.html#building-a-relationship",
     "ORM is built on top of expression language.",

@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
-from logbook import app
+from config.development import DB_URI
 
 Base = declarative_base()
 
@@ -40,6 +40,6 @@ class Log(Base):
     user = relationship(User)
 
 # DB_URI = 'sqlite:////vagrant/logbook/db/logbook.db'
-engine = create_engine(app.config['DB_URI'])
+engine = create_engine(DB_URI)
 
 Base.metadata.create_all(engine)
