@@ -9,7 +9,7 @@
 
 """
 
-from flask.ext.script import Manager
+from flask.ext.script import Manager, Server
 
 from logbook import create_app
 
@@ -21,6 +21,7 @@ except ImportError:
 
 app = create_app(Config)
 manager = Manager(app)
+manager.add_command("runserver", Server(host="0.0.0.0", port=8000))
 
 if __name__ == "__main__":
     manager.run()
