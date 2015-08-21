@@ -1,45 +1,45 @@
 # models.py
+"""
+    logbook.log.models
+    ~~~~~~~~~~~~~~~~~~
 
-from sqlalchemy import Table, Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.sql import func
-from config.development import DB_URI
+    This file provides models for logbook
+"""
 
-Base = declarative_base()
+from logbook.extensions import db
+from datetime import datetime
 
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250))
-    email = Column(String(250), nullable=False, unique=True)
-    picture = Column(String(250))
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    email = db.Column(db.String(250), nullable=False, unique=True)
+    picture = db.Column(db.String(250))
 
-log_tag_table = Table('log_tag', Base.metadata,
-    Column('tag_id', Integer, ForeignKey('tag.id')),
-    Column('log_id', Integer, ForeignKey('log.id'))
+    def __init__(self, name, email, picture):
+        self.name = name
+        self.email = email
+        self.picture = picture
+
+    def __repr__(self):
+        return '<User %r>' % self.name
+
+tags = db.Table('tags',
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
+    db.Column('log_id', db.Integer, db.ForeignKey('log.id'))
 )
 
-class Tag(Base):
-    __tablename__ = 'tag'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250))
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
 
-class Log(Base):
-    __tablename__ = 'log'
-    id = Column(Integer, primary_key=True)
-    subject = Column(String(250))
-    link = Column(String(250))
-    notes = Column(String)
-    tag = relationship("Tag", secondary=log_tag_table,
-                    backref="logs")
-    create_date = Column(DateTime, default=func.now())
-    update_date = Column(DateTime, default=func.now())
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    user = relationship(User)
-
-# DB_URI = 'sqlite:////vagrant/logbook/db/logbook.db'
-engine = create_engine(DB_URI)
-
-Base.metadata.create_all(engine)
+class Log(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subject = db.Column(db.String(250))
+    link = db.Column(db.String(250))
+    notes = db.Column(db.String)
+    tag = db.relationship("Tag", secondary=tags,
+                    backref=db.backref('logs', lazy='dynamic'))
+    create_date = db.Column(db.DateTime, default=datetime.utcnow())
+    update_date = db.Column(db.DateTime, default=datetime.utcnow())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship(User)

@@ -12,7 +12,7 @@ class DevelopmentConfig(DefaultConfig):
 
     DEBUG = True
     
-    SQLALCHEMY_DB_URI = 'sqlite:////vagrant/logbook/db/logbook.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////vagrant/logbook/logbook/db/logbook.db'
 
     # Security
     SECRET_KEY = "SuperSecretKeyForSession"
