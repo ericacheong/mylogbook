@@ -13,6 +13,14 @@ log = Blueprint('log', __name__)
 def index():
 	return 'Hello. This is my logbook!'
 
-@log.route('/add')
-def addLog():
+@log.route('/new/')
+def new_log():
     return "This page adds a log entry."
+
+@log.route('/<int:log_id>/edit/')
+def edit_log():
+    return "This page edits a log entry."
+
+@log.route('/<int:log_id>/delete')
+def delete_log():
+    return "This page deletes a log entry."
