@@ -1,26 +1,26 @@
-{% extends "bootstrap/base.html" %}
-{% block title %}This is an example page{% endblock %}
+{% extends "layout.html" %}
 
-{% block navbar %}
-<div class="navbar navbar-fixed-top">
-  <!-- ... -->
-</div>
-{% endblock %}
 
-{% block content %}
-  <h1>Hello, Bootstrap</h1>
-    <h2>All logs</h2>
-    <ul>
+{% block main %}
+
     {% for l in logs %}
-        <li>{{l.subject}} : {{l.link}}<br/>
-        {{l.notes}} - {{l.create_date}}<br />
-        {% for t in l.tag %}
-            {{t.name}} 
-        {% endfor %}
-        </li>
+    <div class="row marketing">
+        
+        <div class="col-lg-2">
+            <b>{{l.create_date.strftime('%Y-%m-%d')}}</b>
+        </div>
+        <div class="col-lg-10">
+            <b>{{l.subject}}</b><br />
+            <small><a href="{{l.link}}">{{l.link}}</a></small>
+            <p>{{l.notes}}</p>
+            <small class="tag">
+            {% for t in l.tag %}
+                <a href="#">{{t.name}}</a> 
+            {% endfor %}
+            </small>
+        </div>
+    </div>    
     {% endfor %}
-    </ul>
-
 
 {% endblock %}
 
