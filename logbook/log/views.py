@@ -6,12 +6,15 @@
 """
 
 from flask import current_app, Blueprint, render_template
+from logbook.log.models import User, Tag, Log
 
 log = Blueprint('log', __name__)
 
 @log.route('/')
 def index():
-	return 'Hello. This is my logbook!'
+    logs = Log.query.all()
+    return render_template("index.html", logs=logs)
+	# return 'Hello. This is my logbook!'
 
 @log.route('/new/')
 def new_log():

@@ -40,7 +40,7 @@ class Log(db.Model):
     notes = db.Column(db.String)
     tag = db.relationship("Tag", secondary=tag_log_tbl,
                     backref=db.backref('log', lazy='dynamic'))
-    create_date = db.Column(db.DateTime, default=datetime.utcnow())
-    update_date = db.Column(db.DateTime, default=datetime.utcnow())
+    create_date = db.Column(db.DateTime, default=datetime.now())
+    update_date = db.Column(db.DateTime, default=datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship(User)

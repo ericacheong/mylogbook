@@ -1,0 +1,22 @@
+<html> 
+<head>
+    
+
+</head>
+
+<body>
+    <h2>All logs</h2>
+    <ul>
+    {% for l in logs %}
+        <li>{{l.subject}} : {{l.link}}<br/>
+        {{l.notes}} - {{l.create_date}}<br />
+        {% for t in l.tag %}
+            {{t.name}} 
+        {% endfor %}
+        </li>
+    {% endfor %}
+    </ul>
+
+</body>
+
+</html>
