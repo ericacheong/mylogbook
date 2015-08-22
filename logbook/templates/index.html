@@ -1,10 +1,14 @@
-<html> 
-<head>
-    
+{% extends "bootstrap/base.html" %}
+{% block title %}This is an example page{% endblock %}
 
-</head>
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <!-- ... -->
+</div>
+{% endblock %}
 
-<body>
+{% block content %}
+  <h1>Hello, Bootstrap</h1>
     <h2>All logs</h2>
     <ul>
     {% for l in logs %}
@@ -17,6 +21,8 @@
     {% endfor %}
     </ul>
 
-</body>
 
-</html>
+{% endblock %}
+
+
+

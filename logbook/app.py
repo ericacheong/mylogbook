@@ -10,6 +10,7 @@ from flask import Flask
 from log.views import log
 from admin.views import admin
 from user.views import user
+from flask_bootstrap import Bootstrap
 # extensions
 from extensions import db
 
@@ -26,13 +27,7 @@ def create_app(config=None):
     app.config.from_envvar("LOGBOOK_SETTINGS", silent=True)
 
     configure_blueprints(app)
-    # configure_extensions(app)
-
-    # Flask-SQLAlchemy
-    db.init_app(app)
-    with app.test_request_context():
-        from log.models import User, Tag, Log
-        db.create_all()
+    configure_extensions(app)
 
     return app
 
@@ -45,4 +40,11 @@ def configure_blueprints(app):
 def configure_extensions(app):
     """Configure the extensions."""
 
-    
+    # Flask-SQLAlchemy
+    db.init_app(app)
+    with app.test_request_context():
+        from log.models import User, Tag, Log
+        db.create_all()
+
+    # Bootstrap
+    Bootstrap(app)
