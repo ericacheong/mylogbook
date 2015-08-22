@@ -10,7 +10,7 @@
 from logbook.app import create_app
 from logbook.extensions import db
 from logbook.log.models import User, Tag, Log
-# from logbook.config.development import DevelopmentConfig as Config
+from random import sample
    
 def load_seed_data():
     users = [
@@ -22,6 +22,13 @@ def load_seed_data():
         name, email, pic = u
         user = User(name=name, email=email, picture=pic)
         db.session.add(user)
+        db.session.commit()
+
+    tags = ['sql','python','programming']
+
+    for t in tags:
+        tag = Tag(name=t)
+        db.session.add(tag)
         db.session.commit()
 
     logs = [
@@ -38,6 +45,10 @@ def load_seed_data():
     for l in logs:
         subject, link, notes, user_id = l
         log = Log(subject=subject, link=link, notes=notes, user_id=user_id)
+        t_ids = sample([1,2,3], 2)
+        for t in t_ids:
+            tag = Tag.query.get(t)
+            log.tag.append(tag)
         db.session.add(log)
         db.session.commit()
 

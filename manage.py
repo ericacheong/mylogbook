@@ -17,6 +17,7 @@ from logbook.utils.seeddata import load_seed_data
 # Use the development configuration if available
 try:
     from logbook.config.development import DevelopmentConfig as Config
+    # from logbook.config.production import ProductionConfig as Config
 except ImportError:
     from logbook.config.default import DefaultConfig as Config
 
