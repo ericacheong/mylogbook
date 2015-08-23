@@ -15,7 +15,7 @@
             <p>{{l.notes}}</p>
             <small class="tag">
             {% for t in l.tag %}
-                <a href="#">{{t.name}}</a> 
+                <a href="{{url_for('log.show_tag',tagname=t.name)}}">{{t.name}}</a> 
             {% endfor %}
             </small>
         </div>
