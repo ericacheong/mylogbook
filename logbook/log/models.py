@@ -31,7 +31,7 @@ tag_log_tbl = db.Table('tag_log_tbl',
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250))
+    name = db.Column(db.String(250), unique=True)
 
 class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)

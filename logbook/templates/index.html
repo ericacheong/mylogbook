@@ -6,10 +6,10 @@
     {% for l in logs %}
     <div class="row marketing">
         
-        <div class="col-lg-2">
-            <b>{{l.create_date.strftime('%Y-%m-%d')}}</b>
+        <div class="col-md-2">
+            <b>{{l.create_date.strftime('%Y-%m-%d %H:%M')}}</b>
         </div>
-        <div class="col-lg-10">
+        <div class="col-md-10">
             <b>{{l.subject}}</b><br />
             <small><a href="{{l.link}}">{{l.link}}</a></small>
             <p>{{l.notes}}</p>
@@ -21,8 +21,8 @@
         </div>
     </div>    
     {% endfor %}
+    <div class ="row marketing">
+        <a class="btn btn-primary pull-right" href="{{url_for('log.new_log')}}">Add Log</a>
+    </div>
 
 {% endblock %}
-
-
-

@@ -11,6 +11,7 @@ from logbook.app import create_app
 from logbook.extensions import db
 from logbook.log.models import User, Tag, Log
 from random import sample
+from datetime import datetime
    
 def load_seed_data():
     users = [
@@ -35,16 +36,19 @@ def load_seed_data():
         ["sqlalchemy ORM tutorial", 
         "http://docs.sqlalchemy.org/en/rel_1_0/orm/tutorial.html#building-a-relationship",
         "ORM is built on top of expression language.",
-        1],
+        1,
+        datetime.strptime('2015-01-02 11:33', '%Y-%m-%d %H:%M')],
         ["Python tutorial - looping",
         "https://docs.python.org/2/tutorial/datastructures.html#looping-techniques",
         "",
-        2]
+        2,
+        datetime.strptime('2015-07-02 18:06', '%Y-%m-%d %H:%M')]
     ]
 
     for l in logs:
-        subject, link, notes, user_id = l
-        log = Log(subject=subject, link=link, notes=notes, user_id=user_id)
+        subject, link, notes, user_id, date = l
+        log = Log(subject=subject, link=link, notes=notes, user_id=user_id,
+            create_date=date)
         t_ids = sample([1,2,3], 2)
         for t in t_ids:
             tag = Tag.query.get(t)
