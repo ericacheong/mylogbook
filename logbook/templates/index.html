@@ -10,19 +10,26 @@
             <b>{{l.create_date.strftime('%Y-%m-%d %H:%M')}}</b>
         </div>
         <div class="col-md-10">
-            <b>{{l.subject}}</b><br />
+            <b>{{l.subject}}</b>
+            <br />
             <small><a href="{{l.link}}">{{l.link}}</a></small>
+            <br />
             <p>{{l.notes}}</p>
             <small class="tag">
             {% for t in l.tag %}
                 <a href="{{url_for('log.show_tag',tagname=t.name)}}">{{t.name}}</a> 
             {% endfor %}
+            <a class="btn btn-default btn-xs pull-right delete"
+            href="{{url_for('log.delete_log', log_id=l.id)}}">Delete</a>
+            <a class="btn btn-default btn-xs pull-right edit" 
+            href="{{url_for('log.edit_log', log_id=l.id)}}">Edit</a>
+
             </small>
         </div>
     </div>    
     {% endfor %}
-    <div class ="row marketing">
+    <!--div class ="row marketing">
         <a class="btn btn-primary pull-right" href="{{url_for('log.new_log')}}">Add Log</a>
-    </div>
+    </div-->
 
 {% endblock %}

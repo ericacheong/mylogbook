@@ -31,6 +31,11 @@ body {
   background-color: #FF6600;
 }
 
+/* index page */
+a.edit {
+  margin-right: 5px
+}
+
 /* Custom page footer */
 .footer {
   padding-top: 19px;
