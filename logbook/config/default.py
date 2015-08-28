@@ -14,6 +14,9 @@ class DefaultConfig(object):
 
     DEBUG = False
     TESTING = False
+    # Security
+    # This is the secret key that is used for session signing.
+    SECRET_KEY = 'secret key'
 
     # URL Prefixes
     LOG_URL_PREFIX = ""

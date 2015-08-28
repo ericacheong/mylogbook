@@ -6,10 +6,12 @@
 """
 
 from flask import (current_app, Blueprint, render_template, request, 
-    redirect, url_for, flash)
+    redirect, url_for, flash, abort)
 from logbook.log.models import User, Tag, Log
-from logbook.extensions import db
+from logbook.extensions import db, login_manager
 from datetime import datetime
+from logbook.log.forms import LoginForm
+from flask.ext.login import login_user, login_required, logout_user
 
 log = Blueprint('log', __name__)
 
@@ -19,6 +21,7 @@ def index():
     return render_template("index.html", logs=logs)
 
 @log.route('/new/', methods=['GET','POST'])
+@login_required
 def new_log():
     if request.method == 'POST':
         print "in POST"
@@ -56,7 +59,7 @@ def edit_log(log_id):
     else:
         return render_template("log/editlog.html", log=log)
 
-@log.route('/<int:log_id>/delete', methods=['GET','POST'])
+@log.route('/<int:log_id>/delete/', methods=['GET','POST'])
 def delete_log(log_id):
     log = Log.query.get(log_id)
     if request.method == 'POST':
@@ -69,8 +72,34 @@ def delete_log(log_id):
 
     return "This page deletes a log entry."
 
-@log.route('/tag/<tagname>')
+@log.route('/tag/<tagname>/')
 def show_tag(tagname):
     logs = Log.query.filter(Log.tag.any(name=tagname)).all()
     return render_template("index.html", logs=logs)
     return "This page shows all entries with %s." % tagname
+
+@log.route('/login/', methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    # if request.method == 'POST' and form.validate():
+    next = request.args.get('next')
+    if form.validate_on_submit():
+        user = request.form['username']
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        login_user(user)
+        flash("Logged in successfully.")
+        
+        if not next_is_valid(next):
+            print "next %s" % next
+            return abort(400)
+        return redirect(next or url_for('log.index'))
+    return render_template("log/login.html", form=form)
+
+def next_is_valid(next):
+    pass
+
+@log.route('/logout/')
+def logout():
+    logout_user()
+    return redirect(url_for('log.index')) 

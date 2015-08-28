@@ -7,13 +7,13 @@
 """
 
 from flask import Flask
-from log.views import log
-from admin.views import admin
-from user.views import user
+from logbook.log.views import log
+from logbook.admin.views import admin
+from logbook.user.views import user
+from logbook.log.models import User
 from flask_bootstrap import Bootstrap
 # extensions
-from extensions import db
-
+from logbook.extensions import db, login_manager, csrf
 
 def create_app(config=None):
     """Creates the app."""
@@ -48,3 +48,14 @@ def configure_extensions(app):
 
     # Bootstrap
     Bootstrap(app)
+
+    # Flask-login
+    @login_manager.user_loader
+    def load_user(userid):
+        """Loads the user. Required by the 'login' extension."""
+        return User.query.get(userid)
+
+    login_manager.init_app(app)
+
+    # Flask-WTF CSRF
+    csrf.init_app(app)
