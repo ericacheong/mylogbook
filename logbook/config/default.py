@@ -22,3 +22,7 @@ class DefaultConfig(object):
     LOG_URL_PREFIX = ""
     ADMIN_URL_PREFIX = "/admin"
     USER_URL_PREFIX = "/user"
+    AUTH_URL_PREFIX = "/auth"
+
+    # Auth
+    LOGIN_VIEW = "auth.login"

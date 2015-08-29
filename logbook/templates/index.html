@@ -19,10 +19,13 @@
             {% for t in l.tag %}
                 <a href="{{url_for('log.show_tag',tagname=t.name)}}">{{t.name}}</a> 
             {% endfor %}
+            
+            {% if current_user.is_authenticated() %}
             <a class="btn btn-default btn-xs pull-right delete"
             href="{{url_for('log.delete_log', log_id=l.id)}}">Delete</a>
             <a class="btn btn-default btn-xs pull-right edit" 
             href="{{url_for('log.edit_log', log_id=l.id)}}">Edit</a>
+            {% endif %}
 
             </small>
         </div>

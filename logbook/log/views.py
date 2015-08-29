@@ -7,38 +7,42 @@
 
 from flask import (current_app, Blueprint, render_template, request, 
     redirect, url_for, flash, abort)
-from logbook.log.models import User, Tag, Log
+from logbook.log.models import Tag, Log
+from logbook.user.models import User
 from logbook.extensions import db, login_manager
+from logbook.log.forms import NewLogForm
 from datetime import datetime
-from logbook.log.forms import LoginForm
-from flask.ext.login import login_user, login_required, logout_user
+from flask.ext.login import login_required, current_user
 
 log = Blueprint('log', __name__)
 
 @log.route('/')
 def index():
     logs = Log.query.order_by(Log.create_date.desc())
+    if current_user is not None and current_user.is_authenticated():
+        logs = Log.query.filter_by(user_id=current_user.id).order_by(Log.create_date.desc())
     return render_template("index.html", logs=logs)
+
 
 @log.route('/new/', methods=['GET','POST'])
 @login_required
 def new_log():
-    if request.method == 'POST':
-        print "in POST"
-        newlog = Log(subject=request.form['subject'],
-                     link=request.form['link'],
-                     notes=request.form['notes'],
-                     user_id=1)  #TODO: get user_id from session
-        
-        # process tags
-        newlog.set_tags(request.form['tag'])
+    form = NewLogForm()
+    
+    if form.validate_on_submit():
+        newlog = Log(subject=form.subject.data,
+                     link=form.link.data,
+                     notes=form.notes.data,
+                     user_id=current_user.id)
+        newlog.set_tags(form.tag.data)
         newlog.save()
-
         return redirect(url_for('log.index'))
+
     else:
-        return render_template("log/newlog.html")
+        return render_template("log/newlog.html", form=form)
 
 @log.route('/<int:log_id>/edit/', methods=['GET','POST'])
+@login_required
 def edit_log(log_id):
     log = Log.query.get(log_id)
     if request.method == 'POST':
@@ -50,6 +54,7 @@ def edit_log(log_id):
             log.notes = request.form['notes']
         if request.form['tag']:
             log.set_tags(request.form['tag'])
+            print request.form['tag']
             
         log.update_date = datetime.now()
         log.save()
@@ -60,6 +65,7 @@ def edit_log(log_id):
         return render_template("log/editlog.html", log=log)
 
 @log.route('/<int:log_id>/delete/', methods=['GET','POST'])
+@login_required
 def delete_log(log_id):
     log = Log.query.get(log_id)
     if request.method == 'POST':
@@ -73,33 +79,9 @@ def delete_log(log_id):
     return "This page deletes a log entry."
 
 @log.route('/tag/<tagname>/')
+@login_required
 def show_tag(tagname):
-    logs = Log.query.filter(Log.tag.any(name=tagname)).all()
+    logs = Log.query.filter((Log.tag.any(name=tagname)))\
+        .filter(Log.user_id==current_user.id).order_by(Log.create_date.desc()).all()
     return render_template("index.html", logs=logs)
-    return "This page shows all entries with %s." % tagname
-
-@log.route('/login/', methods=['GET','POST'])
-def login():
-    form = LoginForm()
-    # if request.method == 'POST' and form.validate():
-    next = request.args.get('next')
-    if form.validate_on_submit():
-        user = request.form['username']
-        email = request.form['email']
-        user = User.query.filter_by(email=email).first()
-        login_user(user)
-        flash("Logged in successfully.")
-        
-        if not next_is_valid(next):
-            print "next %s" % next
-            return abort(400)
-        return redirect(next or url_for('log.index'))
-    return render_template("log/login.html", form=form)
-
-def next_is_valid(next):
-    pass
-
-@log.route('/logout/')
-def logout():
-    logout_user()
-    return redirect(url_for('log.index')) 
+    # return "This page shows all entries with %s." % tagname

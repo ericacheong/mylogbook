@@ -10,7 +10,8 @@ from flask import Flask
 from logbook.log.views import log
 from logbook.admin.views import admin
 from logbook.user.views import user
-from logbook.log.models import User
+from logbook.auth.views import auth
+from logbook.user.models import User
 from flask_bootstrap import Bootstrap
 # extensions
 from logbook.extensions import db, login_manager, csrf
@@ -36,6 +37,7 @@ def configure_blueprints(app):
     app.register_blueprint(log, url_prefix=app.config["LOG_URL_PREFIX"])
     app.register_blueprint(admin, url_prefix=app.config["ADMIN_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
+    app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
 
 def configure_extensions(app):
     """Configure the extensions."""
@@ -49,13 +51,16 @@ def configure_extensions(app):
     # Bootstrap
     Bootstrap(app)
 
-    # Flask-login
+    # Flask-Login
+    login_manager.login_view = app.config["LOGIN_VIEW"]
+
     @login_manager.user_loader
     def load_user(userid):
         """Loads the user. Required by the 'login' extension."""
         return User.query.get(userid)
 
     login_manager.init_app(app)
+
 
     # Flask-WTF CSRF
     csrf.init_app(app)

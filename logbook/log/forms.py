@@ -1,15 +1,21 @@
 """
     logbook.log.forms
-    ~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the log views.
+    This provides the forms that are needed for the log views.
 """
 
 from flask_wtf import Form
-from wtforms import (TextAreaField, StringField, SubmitField, validators)
+from wtforms import StringField, TextAreaField, SubmitField
+from wtforms.validators import Length
 
-class LoginForm(Form):
-    username     = StringField('Username', [validators.Length(min=4, max=25)])
-    email        = StringField('Email Address', [validators.Length(min=6, max=35)])
-    
+class NewLogForm(Form):
+    subject = StringField("Subject", validators=[
+        Length(max=200)],
+        description="Subject")
+    link = StringField("Link", validators=[
+        Length(max=200)],
+        description="Link")
+    notes = TextAreaField("Notes", description="Notes")
+    tag = StringField("Tag", description="Tags (seperated by comma)")
     submit = SubmitField("Submit")

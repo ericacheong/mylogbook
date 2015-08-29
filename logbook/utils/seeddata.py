@@ -9,28 +9,27 @@
 
 from logbook.app import create_app
 from logbook.extensions import db
-from logbook.log.models import User, Tag, Log
+from logbook.log.models import Tag, Log
+from logbook.user.models import User
 from random import sample
 from datetime import datetime
    
 def load_seed_data():
     users = [
-        ['Daniel Crockford', 'dcrockford@example.com', ''],
-        ['Marie Singer', 'marie@example.com', '']
+        ['Daniel Crockford', 'dcrockford@example.com', 'sweetlemon', ''],
+        ['Marie Singer', 'marie@example.com', 'crazysale', '']
     ]
 
     for u in users:
-        name, email, pic = u
-        user = User(name=name, email=email, picture=pic)
-        db.session.add(user)
-        db.session.commit()
+        name, email, pw, pic = u
+        user = User(name=name, email=email, password=pw, picture=pic)
+        user.save()
 
     tags = ['sql','python','programming']
 
     for t in tags:
         tag = Tag(name=t)
-        db.session.add(tag)
-        db.session.commit()
+        tag.save()
 
     logs = [
         ["sqlalchemy ORM tutorial", 
@@ -53,7 +52,6 @@ def load_seed_data():
         for t in t_ids:
             tag = Tag.query.get(t)
             log.tag.append(tag)
-        db.session.add(log)
-        db.session.commit()
+        log.save()
 
 

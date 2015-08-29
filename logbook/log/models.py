@@ -9,32 +9,7 @@
 from logbook.extensions import db
 from datetime import datetime
 
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250))
-    email = db.Column(db.String(250), nullable=False, unique=True)
-    picture = db.Column(db.String(250))
-
-    def __init__(self, name, email, picture):
-        self.name = name
-        self.email = email
-        self.picture = picture
-
-    def is_authenticated(self):
-        return True
- 
-    def is_active(self):
-        return True
- 
-    def is_anonymous(self):
-        return False
- 
-    def get_id(self):
-        return unicode(self.id)
-
-    def __repr__(self):
-        return '<User %r>' % self.name
+from logbook.user.models import User
 
 tag_log_tbl = db.Table('tag_log_tbl',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
@@ -54,6 +29,12 @@ class Tag(db.Model):
         db.session.commit()
         return self
 
+    def delete(self):
+        """Delete tag object from database"""
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
 class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(250))
@@ -61,8 +42,8 @@ class Log(db.Model):
     notes = db.Column(db.String)
     tag = db.relationship("Tag", secondary=tag_log_tbl,
                     backref=db.backref('log', lazy='dynamic'))
-    create_date = db.Column(db.DateTime, default=datetime.now())
-    update_date = db.Column(db.DateTime, default=datetime.now())
+    create_date = db.Column(db.DateTime, default=datetime.utcnow())
+    update_date = db.Column(db.DateTime, default=datetime.utcnow())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship(User)
 
@@ -77,9 +58,12 @@ class Log(db.Model):
 
     def set_tags(self, tags):
         """Set log tags from a list of string tags"""
+        self.tag = []
         tag_list = tags.split(',')
         
         for tag in tag_list:
+            tag = " ".join(tag.split())
+            print "inside set_tags %s" % tag
             t_obj = Tag.query.filter_by(name=tag).first()
             if t_obj is None:
                 # add tag to log

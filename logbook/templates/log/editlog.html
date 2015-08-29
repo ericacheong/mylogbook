@@ -3,6 +3,7 @@
 
 {% block main %}
     <form class="form-horizontal" action="{{url_for('log.edit_log', log_id=log.id)}}" method=post>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="form-group">
             <label for="subject" class="col-sm-2 control-label">Subject</label>
             <div class="col-sm-10">
