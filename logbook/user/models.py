@@ -7,16 +7,16 @@
 
 from logbook.extensions import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250))
     email = db.Column(db.String(250), nullable=False, unique=True)
-    password = db.Column(db.String(250))
+    _password = db.Column('password',db.String(250), nullable=False)
     picture = db.Column(db.String(250))
     registered_on = db.Column(db.DateTime)
-
 
     def __init__(self, name, email, password, picture):
         self.name = name
@@ -40,14 +40,28 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.name
 
+    def _get_password(self):
+        """Returns the hashed password"""
+        return self._password
+
+    def _set_password(self, password):
+        """Generates a password hash for the provided password"""
+        self._password = generate_password_hash(password)
+
+    # Hide password encryption by exposing password field only
+    password = db.synonym('_password',
+                          descriptor=property(_get_password,
+                                               _set_password))
+
     def check_password(self, password):
         """Check passwords. If passwords match it returns true, else false."""
         if self.password is None:
             return False
-        if self.password == password:
-            return True
-        else:
-            return False
+        return check_password_hash(self.password, password)
+        # if self.password == password:
+        #     return True
+        # else:
+        #     return False
 
     @classmethod
     def authenticate(cls, login, password):

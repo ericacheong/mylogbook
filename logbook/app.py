@@ -14,7 +14,7 @@ from logbook.auth.views import auth
 from logbook.user.models import User
 from flask_bootstrap import Bootstrap
 # extensions
-from logbook.extensions import db, login_manager, csrf
+from logbook.extensions import db, login_manager, csrf, migrate
 
 def create_app(config=None):
     """Creates the app."""
