@@ -13,6 +13,7 @@ from logbook.user.views import user
 from logbook.auth.views import auth
 from logbook.user.models import User
 from flask_bootstrap import Bootstrap
+from flask.ext.migrate import Migrate
 # extensions
 from logbook.extensions import db, login_manager, csrf, migrate
 
@@ -61,6 +62,8 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-
     # Flask-WTF CSRF
     csrf.init_app(app)
+
+    # Flask-Migration
+    migrate = Migrate(app, db)

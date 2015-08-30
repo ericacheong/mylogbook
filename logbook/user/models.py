@@ -17,6 +17,7 @@ class User(db.Model):
     _password = db.Column('password',db.String(250), nullable=False)
     picture = db.Column(db.String(250))
     registered_on = db.Column(db.DateTime)
+    lastseen = db.Column(db.DateTime, default=datetime.utcnow())
 
     def __init__(self, name, email, password, picture):
         self.name = name
