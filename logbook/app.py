@@ -15,7 +15,7 @@ from logbook.user.models import User
 from flask_bootstrap import Bootstrap
 from flask.ext.migrate import Migrate
 # extensions
-from logbook.extensions import db, login_manager, csrf, migrate
+from logbook.extensions import db, login_manager, csrf, migrate, mail
 
 def create_app(config=None):
     """Creates the app."""
@@ -67,3 +67,6 @@ def configure_extensions(app):
 
     # Flask-Migration
     migrate = Migrate(app, db)
+
+    # Flask-Mail
+    mail.init_app(app)

@@ -7,7 +7,7 @@
 
 from flask_wtf import Form
 from wtforms import (TextAreaField, StringField, SubmitField, PasswordField,
-    BooleanField)
+    BooleanField, HiddenField)
 from wtforms.validators import (DataRequired, InputRequired, Email, Length,
     ValidationError, EqualTo)
 from logbook.user.models import User
@@ -52,3 +52,31 @@ class RegisterForm(Form):
                     picture=""
                     )
         return user.save()
+
+class ForgotPasswordForm(Form):
+    email = StringField('Email Address', validators=[
+        DataRequired(message="An email address is required"),
+        Email()
+        ])
+    submit = SubmitField("Request Password")
+
+
+class ResetPasswordForm(Form):
+    token = HiddenField('Token')
+
+    email = StringField('E-Mail Address', validators=[
+        DataRequired(message="A E-Mail Address is required."),
+        Email()])
+
+    password = PasswordField('Password', validators=[
+        InputRequired(),
+        EqualTo('confirm_password', message='Passwords must match.')])
+
+    confirm_password = PasswordField('Confirm Password')
+
+    submit = SubmitField("Reset Password")
+
+    def validate_email(self, field):
+        email = User.query.filter_by(email=field.data).first()
+        if not email:
+            raise ValidationError("Wrong E-Mail Address.")

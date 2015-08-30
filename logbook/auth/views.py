@@ -6,10 +6,12 @@
 
 from flask import (Blueprint, render_template, request, redirect,
     url_for, flash, abort)
-from logbook.auth.forms import LoginForm, RegisterForm
+from logbook.auth.forms import (LoginForm, RegisterForm, ForgotPasswordForm, 
+    ResetPasswordForm)
 from logbook.user.models import User
 from flask.ext.login import (login_user, login_required, logout_user, 
     current_user)
+from logbook.email import send_reset_token
 
 auth = Blueprint('auth', __name__)
 
@@ -54,4 +56,60 @@ def register():
         flash("Thank you for registering.", "success")
         return redirect(url_for("log.show_log"))
     return render_template("auth/register.html", form=form)
-    # return "This is a sign up page."
+   
+
+@auth.route('/resetpassword', methods=["GET", "POST"])
+def forgot_password():
+    """
+    Sends a reset password token to the user.
+    """
+
+    if not current_user.is_anonymous():
+        return redirect(url_for("log.index"))
+
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user:
+            token = user.make_reset_token()
+            send_reset_token(user, token=token)
+
+            flash("E-Mail sent! Please check your inbox.", "info")
+            return redirect(url_for("auth.forgot_password"))
+        else:
+            flash("You have entered a Username or E-Mail Address that is "
+                    "not linked with your account.", "danger")
+    return render_template("auth/forgot_password.html", form=form)
+
+
+@auth.route("/resetpassword/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    """
+    Handles the reset password process.
+    """
+
+    if not current_user.is_anonymous():
+        return redirect(url_for("log.index"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        expired, invalid, data = user.verify_reset_token(form.token.data)
+
+        if invalid:
+            flash("Your Password Token is invalid.", "danger")
+            return redirect(url_for("auth.forgot_password"))
+
+        if expired:
+            flash("Your Password Token is expired.", "danger")
+            return redirect(url_for("auth.forgot_password"))
+
+        if user and data:
+            user.password = form.password.data
+            user.save()
+            flash("Your Password has been updated.", "success")
+            return redirect(url_for("auth.login"))
+
+    form.token.data = token
+    return render_template("auth/reset_password.html", form=form)

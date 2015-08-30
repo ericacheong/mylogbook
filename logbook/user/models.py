@@ -4,10 +4,12 @@
 
     This file provides models for users
 """
-
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired
 from logbook.extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 
 class User(db.Model):
     __tablename__ = "users"
@@ -74,6 +76,44 @@ class User(db.Model):
         else:
             authenticated = False
         return user, authenticated
+
+    def _make_token(self, data, timeout):
+        s = Serializer(current_app.config['SECRET_KEY'], timeout)
+        return s.dumps(data)
+
+    def _verify_token(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        data = None
+        expired, invalid = False, False
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            expired = True
+        except Exception:
+            invalid = True
+        return expired, invalid, data
+
+    def make_reset_token(self, expiration=3600):
+        """Creates a reset token. The duration can be configured through the
+        expiration parameter.
+
+        :param expiration: The time in seconds how long the token is valid.
+        """
+        return self._make_token({'id': self.id, 'op': 'reset'}, expiration)
+
+    def verify_reset_token(self, token):
+        """Verifies a reset token. It returns three boolean values based on
+        the state of the token (expired, invalid, data)
+
+        :param token: The reset token that should be checked.
+        """
+
+        expired, invalid, data = self._verify_token(token)
+        if data and data.get('id') == self.id and data.get('op') == 'reset':
+            data = True
+        else:
+            data = False
+        return expired, invalid, data
 
     def save(self):
         """Save user object into database"""

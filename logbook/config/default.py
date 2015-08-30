@@ -26,3 +26,14 @@ class DefaultConfig(object):
 
     # Auth
     LOGIN_VIEW = "auth.login"
+
+    ## Mail
+    MAIL_SERVER = "localhost"
+    MAIL_PORT = 25
+    MAIL_USE_SSL = False
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = "noreply@example.org"
+    MAIL_PASSWORD = ""
+    MAIL_DEFAULT_SENDER = ("Default Sender", "noreply@example.org")
+    # Where to logger should send the emails to
+    ADMINS = ["admin@example.org"]
