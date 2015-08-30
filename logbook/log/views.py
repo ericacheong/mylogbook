@@ -19,8 +19,10 @@ log = Blueprint('log', __name__)
 @log.route('/')
 def index():
     # logs = Log.query.order_by(Log.create_date.desc())
-    # if current_user is not None and current_user.is_authenticated():
-    #     logs = Log.query.filter_by(user_id=current_user.id).order_by(Log.create_date.desc())
+    if current_user is not None and current_user.is_authenticated():
+        logs = Log.query.filter_by(user_id=current_user.id)\
+            .order_by(Log.create_date.desc())
+        return render_template("log/showlog.html", logs=logs)
     return render_template("index.html")
 
 @log.route('/log/')

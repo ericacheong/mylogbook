@@ -25,7 +25,7 @@ def login():
         user, authenticated = User.authenticate(form.email.data, 
             form.password.data)
         if user and authenticated:
-            login_user(user)
+            login_user(user, remember=form.remember_me.data)
             # TODO: Redirect doesn't work
             return redirect(request.args.get("next") or url_for('log.show_log'))
         flash("Wrong email or password.", "danger")

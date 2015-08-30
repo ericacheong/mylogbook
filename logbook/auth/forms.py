@@ -6,7 +6,8 @@
 """
 
 from flask_wtf import Form
-from wtforms import (TextAreaField, StringField, SubmitField, PasswordField)
+from wtforms import (TextAreaField, StringField, SubmitField, PasswordField,
+    BooleanField)
 from wtforms.validators import (DataRequired, InputRequired, Email, Length,
     ValidationError, EqualTo)
 from logbook.user.models import User
@@ -20,6 +21,7 @@ class LoginForm(Form):
         description="Email"
         )
     password     = PasswordField(description="Password")
+    remember_me = BooleanField("Remember Me", default=False)
     submit = SubmitField("Submit")
 
 class RegisterForm(Form):
