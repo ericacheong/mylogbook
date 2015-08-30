@@ -13,23 +13,27 @@
  <div class="container">
       <div class="header clearfix">
         <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation"><a href="/">Home</a></li>
+          <ul class="nav nav-pills pull-right">            
 
             {% if current_user.is_authenticated() %}
+            <li role="presentation"><a href="{{url_for('log.show_log')}}">Logs</a></li>
             <li role="presentation"><a href="{{url_for('log.new_log')}}">Add Log</a></li>
             <li role="presentation"><a href="{{url_for('auth.logout')}}">Logout</a></li>
             {% else %}
+            <li role="presentation"><a href="{{url_for('log.index')}}">Home</a></li>
             <li role="presentation"><a href="{{url_for('auth.register')}}">Sign up</a></li>
             <li role="presentation"><a href="{{url_for('auth.login')}}">Login</a></li>
             {% endif %}
           </ul>
         </nav>
-        <h3 class="text-muted">My Logbook</h3>
+        {% if current_user.is_authenticated() %}
+        <h3 class="text-muted"><a href="{{url_for('log.show_log')}}">My Logbook</a></h3>
+        {% else %}
+        <h3 class="text-muted"><a href="{{url_for('log.index')}}">My Logbook</a></h3>
+        {% endif %}
+
       </div>
 
-      
-        <div class="container">
           {% with messages = get_flashed_messages() %}
           {% if messages %}
 
@@ -50,10 +54,6 @@
       {% block main %}
 
       {% endblock %}
-          
-        </div>
-
-
 
       <footer class="footer">
         <nav>

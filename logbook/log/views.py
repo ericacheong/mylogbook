@@ -18,11 +18,16 @@ log = Blueprint('log', __name__)
 
 @log.route('/')
 def index():
-    logs = Log.query.order_by(Log.create_date.desc())
-    if current_user is not None and current_user.is_authenticated():
-        logs = Log.query.filter_by(user_id=current_user.id).order_by(Log.create_date.desc())
-    return render_template("index.html", logs=logs)
+    # logs = Log.query.order_by(Log.create_date.desc())
+    # if current_user is not None and current_user.is_authenticated():
+    #     logs = Log.query.filter_by(user_id=current_user.id).order_by(Log.create_date.desc())
+    return render_template("index.html")
 
+@log.route('/log/')
+@login_required
+def show_log():
+    logs = Log.query.filter_by(user_id=current_user.id).order_by(Log.create_date.desc())
+    return render_template("log/showlog.html", logs=logs)
 
 @log.route('/new/', methods=['GET','POST'])
 @login_required
@@ -60,7 +65,7 @@ def edit_log(log_id):
         log.save()
 
         flash("Log edited.")
-        return redirect(url_for('log.index'))
+        return redirect(url_for('log.show_log'))
     else:
         return render_template("log/editlog.html", log=log)
 
@@ -72,7 +77,7 @@ def delete_log(log_id):
         if log:
             log.delete()
             flash("Log deleted")
-            return redirect(url_for('log.index'))
+            return redirect(url_for('log.show_log'))
     else:
         return render_template('log/deletelog.html', log=log)
 
@@ -83,5 +88,5 @@ def delete_log(log_id):
 def show_tag(tagname):
     logs = Log.query.filter((Log.tag.any(name=tagname)))\
         .filter(Log.user_id==current_user.id).order_by(Log.create_date.desc()).all()
-    return render_template("index.html", logs=logs)
+    return render_template("log/showlog.html", logs=logs)
     # return "This page shows all entries with %s." % tagname

@@ -2,7 +2,7 @@
 
 {% block main %}
 {% from "formhelpers.html" import render_field %}
-<h1>Register</h1>
+<h2>Register</h2>
 <form class="form-horizontal" action="{{url_for('auth.register')}}" method=post>
    
     {{ form.csrf_token }}
