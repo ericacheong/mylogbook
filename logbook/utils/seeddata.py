@@ -23,6 +23,7 @@ def load_seed_data():
     for u in users:
         name, email, pw, pic = u
         user = User(name=name, email=email, password=pw, picture=pic)
+        user.verified = True
         user.save()
 
     tags = ['sql','python','programming']

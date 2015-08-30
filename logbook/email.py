@@ -25,6 +25,22 @@ def send_reset_token(user, token):
         )
     )
 
+def send_registration_token(user, token):
+    send_email(
+        subject="Account activation",
+        recipients=[user.email],
+        text_body=render_template(
+            "email/activate_account.txt",
+            user=user,
+            token=token
+        ),
+        html_body=render_template(
+            "email/activate_account.html",
+            user=user,
+            token=token
+        )
+    )
+
 
 def send_email(subject, recipients, text_body, html_body, sender=None):
     msg = Message(subject, recipients=recipients, sender=sender)

@@ -20,6 +20,7 @@ class User(db.Model):
     picture = db.Column(db.String(250))
     registered_on = db.Column(db.DateTime)
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
+    verified = db.Column(db.Boolean, default=False)
 
     def __init__(self, name, email, password, picture):
         self.name = name
@@ -93,13 +94,13 @@ class User(db.Model):
             invalid = True
         return expired, invalid, data
 
-    def make_reset_token(self, expiration=3600):
+    def make_token(self, op="reset", expiration=3600):
         """Creates a reset token. The duration can be configured through the
         expiration parameter.
 
         :param expiration: The time in seconds how long the token is valid.
         """
-        return self._make_token({'id': self.id, 'op': 'reset'}, expiration)
+        return self._make_token({'id': self.id, 'op': op}, expiration)
 
     def verify_reset_token(self, token):
         """Verifies a reset token. It returns three boolean values based on
@@ -114,6 +115,21 @@ class User(db.Model):
         else:
             data = False
         return expired, invalid, data
+
+    def verify_registration_token(self, token):
+        """Verifies a reset token. It returns three boolean values based on
+        the state of the token (expired, invalid, data)
+
+        :param token: The reset token that should be checked.
+        """
+
+        expired, invalid, data = self._verify_token(token)
+        if data and data.get('id') == self.id and data.get('op') == 'register':
+            data = True
+        else:
+            data = False
+        return expired, invalid, data
+
 
     def save(self):
         """Save user object into database"""

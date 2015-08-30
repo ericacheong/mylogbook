@@ -1,0 +1,10 @@
+{{ url_for('auth.activate_account', email=user.email, token=token, _external=True) }}
+
+Dear {{ user.name }},
+
+To activate your account click on the following link:
+
+{{ link }}
+
+Sincerely,
+My Logbook Team

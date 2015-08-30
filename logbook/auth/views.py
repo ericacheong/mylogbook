@@ -11,7 +11,7 @@ from logbook.auth.forms import (LoginForm, RegisterForm, ForgotPasswordForm,
 from logbook.user.models import User
 from flask.ext.login import (login_user, login_required, logout_user, 
     current_user)
-from logbook.email import send_reset_token
+from logbook.email import send_reset_token, send_registration_token
 
 auth = Blueprint('auth', __name__)
 
@@ -28,7 +28,7 @@ def login():
             form.password.data)
         if user and authenticated:
             login_user(user, remember=form.remember_me.data)
-            # TODO: Redirect doesn't work
+            # TODO: Redirect doesn't work. Need to check next
             return redirect(request.args.get("next") or url_for('log.show_log'))
         flash("Wrong email or password.", "danger")
         
@@ -51,12 +51,39 @@ def register():
 
     if form.validate_on_submit():
         user = form.save()
-        # user = User.query.filter_by(id=user_id)
-        login_user(user)
-        flash("Thank you for registering.", "success")
-        return redirect(url_for("log.show_log"))
+        token = user.make_token(op="register")
+        send_registration_token(user, token=token)
+        flash("Email sent! Please check your inbox.", "info")
+        # login_user(user)
+        # flash("Thank you for registering.", "success")
+        return redirect(url_for("log.index"))
     return render_template("auth/register.html", form=form)
    
+@auth.route("/activateaccount/<email>/<token>")
+def activate_account(email,token):
+    """
+    Handles the register account process.
+    """
+    if not current_user.is_anonymous():
+        return redirect(url_for("log.index"))
+
+    user = User.query.filter_by(email=email).first()
+    expired, invalid, data = user.verify_registration_token(token)
+
+    if invalid:
+        flash("Your account activation link is invalid.", "danger")
+        return redirect(url_for("auth.register"))
+
+    if expired:
+        flash("Your account activation link has expired.", "danger")
+        return redirect(url_for("auth.register"))
+
+    if user and data:
+        user.verified = True
+        user.save()
+        login_user(user)
+        flash("Your account is now activated.", "success")
+        return redirect(url_for("log.show_log"))
 
 @auth.route('/resetpassword', methods=["GET", "POST"])
 def forgot_password():
@@ -72,7 +99,7 @@ def forgot_password():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            token = user.make_reset_token()
+            token = user.make_token(op="reset")
             send_reset_token(user, token=token)
 
             flash("E-Mail sent! Please check your inbox.", "info")
